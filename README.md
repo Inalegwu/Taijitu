@@ -1,4 +1,4 @@
-# taijitu
+# Taijitu
 
 To install dependencies:
 

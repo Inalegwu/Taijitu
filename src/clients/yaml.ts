@@ -1,6 +1,6 @@
 import { Context, Data, Layer } from "effect";
 import { Effect } from "effect";
-import YAML from "yaml";
+import YAML from "js-yaml";
 
 class YamlError extends Data.TaggedError("yaml-error")<{
 	cause: unknown;
@@ -13,7 +13,7 @@ type IYamlClient = Readonly<{
 const make = Effect.gen(function* () {
 	const parse = (content: string) =>
 		Effect.try({
-			try: () => YAML.parse(content),
+			try: () => YAML.load(content),
 			catch: (error) => new YamlError({ cause: error }),
 		});
 

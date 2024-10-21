@@ -7,7 +7,9 @@
 		"@types/js-yaml": "^4.0.9"
 	},
 	"scripts": {
-		"dev": "bun run src/main.ts"
+		"dev": "bun run src/main.ts",
+		"dev:watch": "bun run --watch src/main.ts",
+		"compile": "bun build --target=node --compile --minify --sourcemap --bytecode src/main.ts --outfile taijitu"
 	},
 	"peerDependencies": {
 		"typescript": "^5.0.0"

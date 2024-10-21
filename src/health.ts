@@ -2,12 +2,12 @@ import { Context, Duration, Effect, Layer, Schedule, Data } from "effect";
 import * as Servers from "./state";
 import { HttpClient } from "@effect/platform";
 
-class HealthCheckError extends Data.TaggedError("health-check-error")<{
+class HealthCheckError extends Data.TaggedError("doctor-error")<{
 	cause: unknown;
 }> {}
 
 const make = Effect.gen(function* () {
-	yield* Effect.logInfo("Starting Health Check Service");
+	yield* Effect.logInfo("Starting Doctor");
 
 	const serverState = yield* Servers.make;
 	const servers = yield* serverState.get;
@@ -31,15 +31,12 @@ const make = Effect.gen(function* () {
 				},
 			);
 		}),
-		Schedule.exponential(Duration.millis(500)),
+		Schedule.fixed(Duration.seconds(5)),
 	);
 
 	yield* Effect.acquireRelease(
-		Effect.andThen(
-			Effect.logInfo("HealthCheck Service Started"),
-			Effect.forkDaemon(health),
-		),
-		() => Effect.logInfo("Stopped Health Check Service"),
+		Effect.andThen(Effect.logInfo("Doctor Started"), Effect.forkDaemon(health)),
+		(fiber) => fiber.interruptAsFork(fiber.id()),
 	);
 }).pipe(
 	Effect.annotateLogs({
@@ -47,6 +44,6 @@ const make = Effect.gen(function* () {
 	}),
 );
 
-export class Health extends Context.Tag("healthcheck-service")<Health, void>() {
+export class Health extends Context.Tag("doctor-service")<Health, void>() {
 	static Live = Layer.effect(this, make);
 }

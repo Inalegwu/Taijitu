@@ -1,4 +1,4 @@
-import { Effect, Ref } from "effect";
+import { Effect, Ref, SynchronizedRef } from "effect";
 import config from "./config";
 
 type ServerState = Array<
@@ -13,11 +13,14 @@ export class Servers {
 	update: (address: string, inUse: boolean) => Effect.Effect<void>;
 	get: Effect.Effect<ServerState>;
 
-	constructor(private value: Ref.Ref<ServerState>) {
+	constructor(private value: SynchronizedRef.SynchronizedRef<ServerState>) {
 		this.update = (addr: string, inUse?: boolean, healthy?: boolean) =>
-			Ref.update(this.value, (a) => a);
+			SynchronizedRef.updateEffect(this.value, (a) =>
+				// @ts-expect-error
+				Effect.gen(function* () {}),
+			);
 
-		this.get = Ref.get(this.value);
+		this.get = SynchronizedRef.get(this.value);
 	}
 }
 
@@ -25,7 +28,7 @@ export const make = Effect.andThen(
 	Effect.gen(function* () {
 		const conf = yield* config;
 
-		return yield* Ref.make(
+		return yield* SynchronizedRef.make(
 			conf.servers.map((s) => ({
 				address: s,
 				inUse: false,

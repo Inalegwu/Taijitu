@@ -1,4 +1,4 @@
-![balance](https://github.com/Inalegwu/Taijitu/blob/main/assets/balance.jpeg)
+![balance](https://github.com/Inalegwu/Taijitu/blob/main/assets/balance.jpg)
 
 # Taijitu
 A Load Balancer Designed to be simple to configure and Highly Performant

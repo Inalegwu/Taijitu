@@ -1,15 +1,5 @@
+![balance](https://github.com/Inalegwu/Taijitu/assets/balance.jpeg)
+
 # Taijitu
-
-To install dependencies:
-
-```bash
-bun install
-```
-
-To run:
-
-```bash
-bun run src/main.ts
-```
-
-This project was created using `bun init` in bun v1.1.29. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
+A Load Balancer Designed to be simple to configure and Highly Performant
+using [Bun](https://bun.sh), [Typescript](https://typescriptlang.org/) and the [Effect Ecosystem](https://effect.website)

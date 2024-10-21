@@ -8,6 +8,12 @@ const router = HttpRouter.empty.pipe(
 			throw new Error("TODO");
 		}),
 	),
+	HttpRouter.post(
+		"*",
+		Effect.sync(() => {
+			throw new Error("TODO");
+		}),
+	),
 );
 
 const app = router.pipe(HttpServer.serve);

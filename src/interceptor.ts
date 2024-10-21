@@ -8,9 +8,6 @@ const make = Effect.gen(function* () {
 	// ensure we aren't getting any servers already
 	// handling a transaction and any servers that
 	// have been marked unhealthy by the health checker
-	const usableServers = servers.filter(
-		(v) => v.healthy === true && v.inUse !== true,
-	);
 
 	const listener = Effect.gen(function* () {
 		yield* Effect.logInfo("Interceptor started");

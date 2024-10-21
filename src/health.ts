@@ -14,7 +14,7 @@ const make = Effect.gen(function* () {
 
 	const health = Effect.repeat(
 		Effect.gen(function* () {
-			const address = servers.map((server) => server.address);
+			const address = servers.entries().map((server) => server[1].address);
 			const httpClient = yield* HttpClient.HttpClient;
 
 			yield* Effect.forEach(
@@ -22,7 +22,10 @@ const make = Effect.gen(function* () {
 				(address) =>
 					Effect.gen(function* () {
 						yield* Effect.try({
-							try: () => httpClient.get(`${address}/health`),
+							try: () => {
+								httpClient.get(`${address}/health`);
+								serverState.update(address, undefined, true);
+							},
 							catch: (error) => new HealthCheckError({ cause: error }),
 						});
 					}),

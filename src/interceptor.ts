@@ -1,6 +1,5 @@
 import { Context, Effect, Layer } from "effect";
 import * as Servers from "./state";
-import { HttpRouter, HttpServer } from "@effect/platform";
 
 const make = Effect.gen(function* () {
 	const serverState = yield* Servers.make;

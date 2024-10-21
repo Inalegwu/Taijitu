@@ -23,8 +23,24 @@ const make = Effect.gen(function* () {
 					Effect.gen(function* () {
 						yield* Effect.try({
 							try: () => {
-								httpClient.get(`${address}/health`);
-								serverState.update(address, undefined, true);
+								httpClient.get(`${address}/health`).pipe(
+									Effect.andThen((res) =>
+										Effect.gen(function* () {
+											const response = yield* res.json;
+
+											const result = response as {
+												alive: number;
+											};
+
+											if (result.alive === 1) {
+												serverState.update(address, undefined, true);
+												return;
+											}
+
+											serverState.update(address, undefined, false);
+										}),
+									),
+								);
 							},
 							catch: (error) => new HealthCheckError({ cause: error }),
 						});

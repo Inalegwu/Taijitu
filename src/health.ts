@@ -1,19 +1,18 @@
 import { Context, Duration, Effect, Layer, Schedule, Data } from "effect";
 import * as Servers from "./state";
-import { HttpClient } from "@effect/platform";
+import { FetchHttpClient, HttpClient } from "@effect/platform";
 
 class HealthCheckError extends Data.TaggedError("doctor-error")<{
 	cause: unknown;
 }> {}
 
 const make = Effect.gen(function* () {
-	yield* Effect.logInfo("Starting Doctor");
-
 	const serverState = yield* Servers.make;
 	const servers = yield* serverState.get;
 
 	const health = Effect.repeat(
 		Effect.gen(function* () {
+			yield* Effect.logInfo("Running Doctor");
 			const address = servers.entries().map((server) => server[1].address);
 			const httpClient = yield* HttpClient.HttpClient;
 
@@ -24,11 +23,11 @@ const make = Effect.gen(function* () {
 						yield* Effect.try({
 							try: () => {
 								httpClient.get(`${address}/health`).pipe(
-									Effect.andThen((res) =>
+									Effect.andThen((response) =>
 										Effect.gen(function* () {
-											const response = yield* res.json;
+											const res = yield* response.json;
 
-											const result = response as {
+											const result = res as {
 												alive: number;
 											};
 
@@ -50,19 +49,17 @@ const make = Effect.gen(function* () {
 				},
 			);
 		}),
-		Schedule.fixed(Duration.seconds(5)),
+		Schedule.exponential(Duration.seconds(5), 2),
 	);
 
-	yield* Effect.acquireRelease(
-		Effect.andThen(Effect.logInfo("Doctor Started"), Effect.forkDaemon(health)),
-		(fiber) => fiber.interruptAsFork(fiber.id()),
-	);
+	yield* Effect.fork(health);
 }).pipe(
+	Effect.provide(FetchHttpClient.layer),
 	Effect.annotateLogs({
-		module: "health-check",
+		module: "t-doctor",
 	}),
 );
 
-export class Health extends Context.Tag("doctor-service")<Health, void>() {
+export class Doctor extends Context.Tag("doctor-service")<Doctor, void>() {
 	static Live = Layer.effect(this, make);
 }

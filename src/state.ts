@@ -57,7 +57,7 @@ export const make = Effect.andThen(
 						address: server,
 						inUse: false,
 						healthy: true,
-					},
+					} satisfies Server,
 				]),
 			),
 		);
@@ -65,6 +65,6 @@ export const make = Effect.andThen(
 	(servers) => new Servers(servers),
 ).pipe(
 	Effect.annotateLogs({
-		module: "state-resource",
+		module: "t-state",
 	}),
 );

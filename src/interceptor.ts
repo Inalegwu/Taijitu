@@ -13,10 +13,12 @@ const make = Effect.gen(function* () {
 		yield* Effect.logInfo("Interceptor started");
 	});
 
-	yield* Effect.fork(listener);
+	yield* Effect.acquireRelease(Effect.fork(listener), () =>
+		Effect.logInfo("Interceptor Stopped"),
+	);
 }).pipe(
 	Effect.annotateLogs({
-		module: "interceptor",
+		module: "t-interceptor",
 	}),
 );
 

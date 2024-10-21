@@ -29,12 +29,12 @@ const acquire = Effect.gen(function* () {
 	};
 }).pipe(
 	Effect.annotateLogs({
-		module: "config-resource",
+		module: "t-config",
 	}),
 );
 
-const config = Effect.acquireRelease(acquire, () =>
-	Effect.logInfo("Cleaning up config"),
-).pipe(Effect.provide(YAMLClient.live));
+const config = Effect.acquireRelease(acquire, () => Effect.void).pipe(
+	Effect.provide(YAMLClient.live),
+);
 
 export default config;

@@ -11,6 +11,6 @@ const make = Effect.gen(function* () {
 });
 
 export const InterceptorService = Layer.scopedDiscard(make).pipe(
-  Layer.provide(ServerProxy),
+  Layer.provide(ServerProxy.Live),
   Layer.provide(FetchHttpClient.layer),
 );

@@ -1,15 +1,14 @@
 import { Context, Effect, Layer } from "effect";
 import { State } from "./state";
+import config from "./config";
 
 const make = Effect.gen(function* () {
   const serverState = yield* State;
   const servers = yield* serverState.get;
 
-  // ensure we aren't getting any servers already
-  // handling a transaction and any servers that
-  // have been marked unhealthy by the health checker
-
   const listener = Effect.gen(function* () {
+    const { algorithm } = yield* config;
+
     yield* Effect.logInfo("Interceptor started");
   });
 

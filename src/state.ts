@@ -15,6 +15,7 @@ class Servers {
     health?: boolean,
   ) => Effect.Effect<void>;
   get: Effect.Effect<ServerState>;
+  roundRobin: Effect.Effect<ServerState>;
 
   constructor(private value: SynchronizedRef.SynchronizedRef<ServerState>) {
     this.update = (addr: string, inUse?: boolean, healthy?: boolean) =>
@@ -37,6 +38,12 @@ class Servers {
       });
 
     this.get = SynchronizedRef.get(this.value);
+    this.roundRobin = SynchronizedRef.updateEffect(this.value, (a) =>
+      // biome-ignore lint/correctness/useYield: <explanation>
+      Effect.gen(function* () {
+        return a;
+      }),
+    );
   }
 }
 
@@ -87,6 +94,6 @@ const make = Effect.gen(function* () {
   } satisfies IState;
 });
 
-export class State extends Context.Tag("state-resourrce")<State, IState>() {
+export class State extends Context.Tag("state-resource")<State, IState>() {
   static live = Layer.effect(this, make);
 }

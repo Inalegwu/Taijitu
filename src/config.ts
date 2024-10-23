@@ -3,9 +3,27 @@ import { YAMLClient } from "./clients/yaml";
 import { Schema } from "effect";
 
 const ConfigSchema = Schema.Struct({
-  servers: Schema.Array(Schema.String),
-  host: Schema.String,
-  port: Schema.Number,
+  servers: Schema.Array(Schema.String).annotations({
+    identifier: "SERVERS",
+    message: () => "Error loading SERVERS from config",
+  }),
+  host: Schema.String.annotations({
+    identifier: "HOST",
+    message: () => "Error Loading HOST from config",
+  }),
+  port: Schema.Number.annotations({
+    identifier: "PORT",
+    message: () => "Error loading PORT from config",
+  }),
+  algorithm: Schema.Literal(
+    "round-robin",
+    "weighted-round-robin",
+    "url-hash",
+  ).pipe(Schema.optional),
+}).annotations({
+  identifier: "config",
+  message: () =>
+    "Error loading config, Certain fields appear to be invalid or missing",
 });
 
 class ConfigError extends Data.TaggedError("config-error")<{
@@ -26,9 +44,7 @@ const acquire = Effect.gen(function* () {
     onExcessProperty: "ignore",
   });
 
-  return {
-    servers: result.servers,
-  };
+  return result;
 }).pipe(
   Effect.annotateLogs({
     module: "t-config",

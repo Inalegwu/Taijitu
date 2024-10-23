@@ -1,5 +1,5 @@
 import { Effect, Layer } from "effect";
-import { FetchHttpClient } from "@effect/platform";
+import { FetchHttpClient, HttpServer } from "@effect/platform";
 import { ServerProxy } from "./proxy";
 
 const make = Effect.gen(function* () {
@@ -11,6 +11,6 @@ const make = Effect.gen(function* () {
 });
 
 export const InterceptorService = Layer.scopedDiscard(make).pipe(
-  Layer.provide(ServerProxy.Live),
+  Layer.provide(ServerProxy),
   Layer.provide(FetchHttpClient.layer),
 );

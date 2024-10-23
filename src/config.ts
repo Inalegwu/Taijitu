@@ -1,58 +1,35 @@
-import { Data, Effect } from "effect";
-import { YAMLClient } from "./clients/yaml";
-import { Schema } from "effect";
-
-const ConfigSchema = Schema.Struct({
-  servers: Schema.Array(Schema.String).annotations({
-    identifier: "SERVERS",
-    message: () => "Error loading SERVERS from config",
-  }),
-  host: Schema.String.annotations({
-    identifier: "HOST",
-    message: () => "Error Loading HOST from config",
-  }),
-  port: Schema.Number.annotations({
-    identifier: "PORT",
-    message: () => "Error loading PORT from config",
-  }),
-  algorithm: Schema.Literal(
-    "round-robin",
-    "weighted-round-robin",
-    "url-hash",
-  ).pipe(Schema.optional),
-}).annotations({
-  identifier: "config",
-  message: () =>
-    "Error loading config, Certain fields appear to be invalid or missing",
-});
+import { Context, Data, Effect, Layer, Schema } from "effect";
+import { Yaml } from "./yaml";
 
 class ConfigError extends Data.TaggedError("config-error")<{
   cause: unknown;
 }> {}
 
-const acquire = Effect.gen(function* () {
-  const yaml = yield* YAMLClient;
+const ConfigSchema = Schema.Struct({
+  servers: Schema.Array(Schema.String),
+  host: Schema.String.pipe(Schema.optional),
+  port: Schema.Number.pipe(Schema.optional),
+});
+
+type IConfig = Readonly<typeof ConfigSchema.Type>;
+
+const make = Effect.gen(function* () {
+  const yaml = yield* Yaml;
 
   const file = yield* Effect.tryPromise({
     try: () => Bun.file("./config.yaml").text(),
     catch: (error) => new ConfigError({ cause: error }),
   });
 
-  const parsed = yield* yaml.parse(file);
+  const result = yield* yaml.parse(file);
 
-  const result = yield* Schema.decodeUnknown(ConfigSchema)(parsed, {
+  const parsed = yield* Schema.decodeUnknown(ConfigSchema)(result, {
     onExcessProperty: "ignore",
   });
 
-  return result;
-}).pipe(
-  Effect.annotateLogs({
-    module: "t-config",
-  }),
-);
+  return parsed satisfies IConfig;
+});
 
-const config = Effect.acquireRelease(acquire, () => Effect.void).pipe(
-  Effect.provide(YAMLClient.live),
-);
-
-export default config;
+export class Config extends Context.Tag("config-resource")<Config, IConfig>() {
+  static live = Layer.effect(this, make).pipe(Layer.provide(Yaml.live));
+}

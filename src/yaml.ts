@@ -1,12 +1,11 @@
-import { Context, Data, Layer } from "effect";
-import { Effect } from "effect";
+import { Context, Data, Effect, Layer } from "effect";
 import YAML from "js-yaml";
 
 class YamlError extends Data.TaggedError("yaml-error")<{
   cause: unknown;
 }> {}
 
-type IYamlClient = Readonly<{
+type IYaml = Readonly<{
   parse: (content: string) => Effect.Effect<unknown, YamlError>;
 }>;
 
@@ -17,14 +16,9 @@ const make = Effect.gen(function* () {
       catch: (error) => new YamlError({ cause: error }),
     });
 
-  return {
-    parse,
-  } satisfies IYamlClient;
+  return { parse } satisfies IYaml;
 });
 
-export class YAMLClient extends Context.Tag("yaml-client")<
-  YAMLClient,
-  IYamlClient
->() {
+export class Yaml extends Context.Tag("yaml-client")<Yaml, IYaml>() {
   static live = Layer.effect(this, make);
 }

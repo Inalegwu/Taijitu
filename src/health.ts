@@ -1,5 +1,5 @@
 import { Context, Duration, Effect, Layer, Schedule, Data } from "effect";
-import * as Servers from "./state";
+import { State } from "./state";
 import { FetchHttpClient, HttpClient } from "@effect/platform";
 
 class HealthCheckError extends Data.TaggedError("doctor-error")<{
@@ -7,7 +7,7 @@ class HealthCheckError extends Data.TaggedError("doctor-error")<{
 }> {}
 
 const make = Effect.gen(function* () {
-  const serverState = yield* Servers.make;
+  const serverState = yield* State;
   const servers = yield* serverState.get;
 
   const health = Effect.repeat(

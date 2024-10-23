@@ -1,8 +1,8 @@
 import { Context, Effect, Layer } from "effect";
-import * as Servers from "./state";
+import { State } from "./state";
 
 const make = Effect.gen(function* () {
-  const serverState = yield* Servers.make;
+  const serverState = yield* State;
   const servers = yield* serverState.get;
 
   // ensure we aren't getting any servers already

@@ -3,28 +3,28 @@ import { Effect } from "effect";
 import YAML from "js-yaml";
 
 class YamlError extends Data.TaggedError("yaml-error")<{
-	cause: unknown;
+  cause: unknown;
 }> {}
 
 type IYamlClient = Readonly<{
-	parse: (content: string) => Effect.Effect<any, YamlError>;
+  parse: (content: string) => Effect.Effect<unknown, YamlError>;
 }>;
 
 const make = Effect.gen(function* () {
-	const parse = (content: string) =>
-		Effect.try({
-			try: () => YAML.load(content),
-			catch: (error) => new YamlError({ cause: error }),
-		});
+  const parse = (content: string) =>
+    Effect.try({
+      try: () => YAML.load(content),
+      catch: (error) => new YamlError({ cause: error }),
+    });
 
-	return {
-		parse,
-	} satisfies IYamlClient;
+  return {
+    parse,
+  } satisfies IYamlClient;
 });
 
 export class YAMLClient extends Context.Tag("yaml-client")<
-	YAMLClient,
-	IYamlClient
+  YAMLClient,
+  IYamlClient
 >() {
-	static live = Layer.effect(this, make);
+  static live = Layer.effect(this, make);
 }

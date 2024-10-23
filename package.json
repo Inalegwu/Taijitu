@@ -1,24 +1,27 @@
 {
-	"name": "taijitu",
-	"module": "src/main.ts",
-	"type": "module",
-	"devDependencies": {
-		"@types/bun": "latest",
-		"@types/js-yaml": "^4.0.9"
-	},
-	"scripts": {
-		"dev": "bun run src/main.ts",
-		"dev:watch": "bun run --watch src/main.ts",
-		"compile": "bun build --target=node --compile --minify --sourcemap --bytecode src/main.ts --outfile taijitu"
-	},
-	"peerDependencies": {
-		"typescript": "^5.0.0"
-	},
-	"dependencies": {
-		"@effect/platform": "^0.68.6",
-		"@effect/platform-bun": "^0.48.6",
-		"@effect/schema": "^0.75.5",
-		"effect": "^3.9.2",
-		"js-yaml": "^4.1.0"
-	}
+  "name": "taijitu",
+  "module": "src/main.ts",
+  "type": "module",
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@types/bun": "latest",
+    "@types/js-yaml": "^4.0.9"
+  },
+  "scripts": {
+    "dev": "bun run src/main.ts",
+    "dev:watch": "bun run --watch src/main.ts",
+    "compile": "bun build --target=node --compile --minify --sourcemap --bytecode src/main.ts --outfile taijitu"
+  },
+  "peerDependencies": {
+    "typescript": "^5.6.3"
+  },
+  "dependencies": {
+    "@effect/platform": "^0.68.6",
+    "@effect/platform-bun": "^0.48.6",
+    "effect": "^3.10.1",
+    "js-yaml": "^4.1.0"
+  },
+  "trustedDependencies": [
+    "@biomejs/biome"
+  ]
 }

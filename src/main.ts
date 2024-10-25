@@ -1,8 +1,7 @@
 import { Layer } from "effect";
 import { BunRuntime } from "@effect/platform-bun";
 import { DoctorService } from "./doctor/service";
-import { InterceptorService } from "./interceptor/service";
 
-const MainLive = Layer.mergeAll(DoctorService, InterceptorService);
+const MainLive = Layer.mergeAll(DoctorService);
 
 BunRuntime.runMain(Layer.launch(MainLive));

@@ -20,22 +20,14 @@ const App = router.pipe(
   Effect.annotateLogs({
     service: "proxy-service",
   }),
-  HttpServer.serve,
+  HttpServer.serve(),
+  HttpServer.withLogAddress,
 );
 
-class Live extends Context.Tag("proxy-server")<Live, void>() {
-  static live = Layer.effect(
-    this,
-    Effect.gen(function* () {
-      const config = yield* Config;
-
-      return yield* BunHttpServer.make({
-        port: config.port || 8081,
-      });
-    }),
-  ).pipe(Layer.provide(Config.live));
-}
+const Live = BunHttpServer.layer({
+  port: 8081,
+}).pipe();
 
 export const Server = {
-  live: Layer.provide(App, Live.live),
+  Live: Layer.provide(App, Live),
 };

@@ -1,7 +1,6 @@
 import { HttpRouter, HttpServer, HttpServerResponse } from "@effect/platform";
 import { BunHttpServer } from "@effect/platform-bun";
-import { Context, Effect, Layer } from "effect";
-import { Config } from "../config";
+import { Effect, Layer } from "effect";
 
 const router = HttpRouter.empty.pipe(
   HttpRouter.all(
@@ -21,7 +20,6 @@ const App = router.pipe(
     service: "proxy-service",
   }),
   HttpServer.serve(),
-  HttpServer.withLogAddress,
 );
 
 const Live = BunHttpServer.layer({

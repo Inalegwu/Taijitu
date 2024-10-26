@@ -3,6 +3,7 @@ import { Yaml } from "./yaml";
 
 class ConfigError extends Data.TaggedError("config-error")<{
   cause: unknown;
+  message: string;
 }> {}
 
 const ConfigSchema = Schema.Struct({
@@ -18,7 +19,8 @@ const make = Effect.gen(function* () {
 
   const file = yield* Effect.tryPromise({
     try: () => Bun.file("./config.yaml").text(),
-    catch: (error) => new ConfigError({ cause: error }),
+    catch: (error) =>
+      new ConfigError({ cause: error, message: "Error loading config" }),
   });
 
   const result = yield* yaml.parse(file);
@@ -28,7 +30,11 @@ const make = Effect.gen(function* () {
   });
 
   return parsed satisfies IConfig;
-});
+}).pipe(
+  Effect.annotateLogs({
+    resource: "config-resource",
+  }),
+);
 
 export class Config extends Context.Tag("config-resource")<Config, IConfig>() {
   static live = Layer.effect(this, make).pipe(Layer.provide(Yaml.live));

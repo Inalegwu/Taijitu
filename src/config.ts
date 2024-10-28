@@ -10,6 +10,14 @@ const ConfigSchema = Schema.Struct({
   servers: Schema.Array(Schema.String),
   host: Schema.String.pipe(Schema.optional),
   port: Schema.Number.pipe(Schema.optional),
+  algorithm: Schema.Literal(
+    "round-robin",
+    "sticky-round-robin",
+    "weighted-round-robin",
+    "ip-url-hash",
+    "least-connections",
+    "least-time",
+  ),
 });
 
 type IConfig = Readonly<typeof ConfigSchema.Type>;

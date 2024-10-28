@@ -1,4 +1,4 @@
-import { Effect, Layer, Schema } from "effect";
+import { Duration, Effect, Layer, Schedule, Schema } from "effect";
 import { Config } from "../config";
 import { HttpClient } from "@effect/platform";
 
@@ -10,15 +10,18 @@ const make = Effect.gen(function* () {
   const config = yield* Config;
 
   const fiber = Effect.forkDaemon(
-    Effect.gen(function* () {
-      const client = yield* HttpClient.HttpClient;
+    Effect.repeat(
+      Effect.gen(function* () {
+        const client = yield* HttpClient.HttpClient;
 
-      yield* Effect.forEach(config.servers, (server) =>
-        Effect.gen(function* () {
-          yield* Effect.void;
-        }),
-      );
-    }),
+        yield* Effect.forEach(config.servers, (server) =>
+          Effect.gen(function* () {
+            yield* Effect.void;
+          }),
+        );
+      }),
+      Schedule.duration(Duration.millis(1000)),
+    ),
   );
 
   yield* Effect.acquireRelease(fiber, (fiber) =>
@@ -26,11 +29,7 @@ const make = Effect.gen(function* () {
       .interruptAsFork(fiber.id())
       .pipe(Effect.tap(Effect.logInfo("Stopped Doctor Check"))),
   );
-}).pipe(
-  Effect.annotateLogs({
-    service: "check",
-  }),
-);
+});
 
 export const Check = {
   Live: Layer.scopedDiscard(make).pipe(Layer.provide(Config.live)),

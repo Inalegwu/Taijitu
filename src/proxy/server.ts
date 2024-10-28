@@ -30,6 +30,10 @@ const Live = Layer.unwrapEffect(
   Effect.gen(function* () {
     const config = yield* Config;
 
+    yield* Effect.logInfo(
+      `Starting server on port ${config.port} and host ${config.host}`,
+    );
+
     return BunHttpServer.layer({
       port: config.port || 8081,
       hostname: config.host || "localhost",

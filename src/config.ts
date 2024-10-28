@@ -23,7 +23,7 @@ const make = Effect.gen(function* () {
       new ConfigError({ cause: error, message: "Error loading config" }),
   });
 
-  const result = yield* yaml.parse(file);
+  const result = yield* yaml.load(file);
 
   const parsed = yield* Schema.decodeUnknown(ConfigSchema)(result, {
     onExcessProperty: "ignore",

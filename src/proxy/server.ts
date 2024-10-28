@@ -28,7 +28,7 @@ const Live = Layer.unwrapEffect(
     const config = yield* Config;
 
     yield* Effect.logInfo(
-      `Starting server on port ${config.port} and host ${config.host}`,
+      `Starting server on port '${config.port}' and host '${config.host}'`,
     );
 
     return BunHttpServer.layer({

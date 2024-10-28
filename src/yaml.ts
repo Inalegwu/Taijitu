@@ -6,17 +6,26 @@ class YamlError extends Data.TaggedError("yaml-error")<{
 }> {}
 
 type IYaml = Readonly<{
-  parse: (content: string) => Effect.Effect<unknown, YamlError>;
+  load: (content: string) => Effect.Effect<unknown, YamlError>;
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+  dump: (content: any) => Effect.Effect<string, YamlError>;
 }>;
 
 const make = Effect.gen(function* () {
-  const parse = (content: string) =>
+  const load = (content: string) =>
     Effect.try({
       try: () => YAML.load(content),
       catch: (error) => new YamlError({ cause: error }),
     });
 
-  return { parse } satisfies IYaml;
+  // biome-ignore lint/suspicious/noExplicitAny: required for YAML
+  const dump = (yaml: any) =>
+    Effect.try({
+      try: () => YAML.dump(yaml),
+      catch: (error) => new YamlError({ cause: error }),
+    });
+
+  return { load, dump } satisfies IYaml;
 });
 
 export class Yaml extends Context.Tag("yaml-client")<Yaml, IYaml>() {

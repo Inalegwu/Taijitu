@@ -23,23 +23,20 @@ const App = router.pipe(
   HttpServer.serve(),
 );
 
-const Live = BunHttpServer.layer({
-  port: 8081,
-}).pipe();
+// const Live = BunHttpServer.layer({
+//   port: 8081,
+// }).pipe();
+const Live = Layer.unwrapEffect(
+  Effect.gen(function* () {
+    const config = yield* Config;
+
+    return BunHttpServer.layer({
+      port: config.port || 8081,
+      hostname: config.host || "localhost",
+    });
+  }),
+).pipe(Layer.provide(Config.live));
 
 export const Server = {
-  Live: Layer.unwrapEffect(
-    Effect.gen(function* () {
-      const config = yield* Config;
-
-      yield* Effect.logInfo(
-        `Starting server on port ${config.port} and host ${config.host}`,
-      );
-
-      return BunHttpServer.layer({
-        port: config.port || 8081,
-        hostname: config.host || "localhost",
-      });
-    }),
-  ).pipe(Layer.provide(Config.live)),
+  Live: Layer.provide(App, Live),
 };

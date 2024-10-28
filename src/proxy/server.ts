@@ -23,9 +23,6 @@ const App = router.pipe(
   HttpServer.serve(),
 );
 
-// const Live = BunHttpServer.layer({
-//   port: 8081,
-// }).pipe();
 const Live = Layer.unwrapEffect(
   Effect.gen(function* () {
     const config = yield* Config;

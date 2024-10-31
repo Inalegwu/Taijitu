@@ -8,5 +8,5 @@ type Server = {
 
 export class ServerState extends Context.Tag("server-state")<
   ServerState,
-  Ref.Ref<Server[]>
+  Ref.Ref<Set<Server>>
 >() {}

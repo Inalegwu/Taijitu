@@ -3,7 +3,6 @@ import { Yaml } from "./yaml";
 
 class ConfigError extends Data.TaggedError("config-error")<{
   cause: unknown;
-  message: string;
 }> {}
 
 const ConfigSchema = Schema.Struct({
@@ -27,8 +26,7 @@ const make = Effect.gen(function* () {
 
   const file = yield* Effect.tryPromise({
     try: () => Bun.file("./config.yaml").text(),
-    catch: (error) =>
-      new ConfigError({ cause: error, message: "Error loading config" }),
+    catch: (error) => new ConfigError({ cause: error }),
   });
 
   const result = yield* yaml.load(file);

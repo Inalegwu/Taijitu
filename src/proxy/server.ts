@@ -1,18 +1,23 @@
-import { HttpRouter, HttpServer, HttpServerResponse } from "@effect/platform";
+import {
+  HttpClient,
+  HttpRouter,
+  HttpServer,
+  HttpServerResponse,
+} from "@effect/platform";
 import { BunHttpServer } from "@effect/platform-bun";
 import { Effect, Layer } from "effect";
 import { Config } from "../config";
+import { ServerState } from "../state";
 
 const router = HttpRouter.empty.pipe(
   HttpRouter.all(
     "*",
     Effect.gen(function* () {
       // todo use state here...
-      return yield* HttpServerResponse.json({});
+      return yield* HttpServerResponse.json({
+        hello: "world",
+      });
     }),
-    {
-      uninterruptible: true,
-    },
   ),
 );
 

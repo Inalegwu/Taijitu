@@ -2,7 +2,7 @@ import { Duration, Effect, Layer, Schedule, Schema } from "effect";
 import { Config } from "../config";
 import { HttpClient } from "@effect/platform";
 
-const HealthSchema = Schema.Struct({
+const _HealthSchema = Schema.Struct({
   alive: Schema.Number,
 });
 

@@ -7,7 +7,7 @@ class YamlError extends Data.TaggedError("yaml-error")<{
 
 type IYaml = Readonly<{
   load: (content: string) => Effect.Effect<unknown, YamlError>;
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+  // biome-ignore lint/suspicious/noExplicitAny: needed for yaml
   dump: (content: any) => Effect.Effect<string, YamlError>;
 }>;
 

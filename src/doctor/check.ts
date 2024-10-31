@@ -2,13 +2,31 @@ import { Duration, Effect, Layer, Schedule, Schema } from "effect";
 import { Config } from "../config";
 import { HttpClient } from "@effect/platform";
 
+/**
+ *
+ * the expected response from
+ * the default health check route
+ * all servers intended to be proxied
+ * through taijitu are expected to implement
+ * to ensure they are alive
+ *
+ */
 const _HealthSchema = Schema.Struct({
   alive: Schema.Number,
 });
 
+/**
+ *
+ * Create the Health Check Service
+ *
+ */
 const make = Effect.gen(function* () {
   const config = yield* Config;
 
+  // Forks this fiber into the global scope
+  // to ensure that this scope closing won't
+  // prevent health checks from being carried
+  // out
   const fiber = Effect.forkDaemon(
     Effect.repeat(
       Effect.gen(function* () {
@@ -24,6 +42,8 @@ const make = Effect.gen(function* () {
     ),
   );
 
+  // Spawn and subsequently shutdown the health check
+  // fiber when the program is winding down
   yield* Effect.acquireRelease(fiber, (fiber) =>
     fiber
       .interruptAsFork(fiber.id())
